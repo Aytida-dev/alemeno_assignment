@@ -56,7 +56,6 @@ def check_eligiblity(request):
         
         if not serializer.is_valid():
             return Response({'message': 'Invalid data', 'errors': serializer.errors}, status=400)
-        
         try:
             customer_id = serializer.validated_data['customer_id']
             customer = Customer.objects.get(customer_id=customer_id)
@@ -68,7 +67,9 @@ def check_eligiblity(request):
         if status == "REJECT":
             return Response({'customer_id':customer.customer_id , 'approval':False}, status=200)
         
+        print(credit_score)
         result = get_loan(credit_score)
+        print(result)
         if result['status'] == "REJECT":
             return Response({'customer_id':customer.customer_id , 'approval':False}, status=200)
         
@@ -140,7 +141,7 @@ def create_loan(request):
         return Response({'message': 'An unexpected error occurred'}, status=500)
     
 @api_view(['GET'])
-def get_loan(request , loan_id):
+def get_loan_by_loan_id(request , loan_id):
     try:
         result = Loan.objects.select_related('customer_id').get(loan_id=loan_id)
         loan = LoanSerializer(result).data
